@@ -150,7 +150,7 @@ Full details and citations are in `PAPER.md` Section 2.4.
 
   The numbers in Section 3 are checked. Also there: IWSM 2024 (CodeBERT on Python + **C#**) and SEAA 2024 (BERT on user stories).
 - [ ] Read IWSM 2024 in depth, since its C# dataset is relevant to G2.
-- [x] Decision: **Python is the first language** (2026-10-17). Understand license still pending (user will apply later).
+- [x] Decision: **Python is the first language** (2026-10-17). Understand **installed** 2026-10-17 (Build 1265, `und`/`userver`/`upython` on PATH via `~/.zshrc`, plus VS Code extension v1.1.6). **License still pending:** get a trial or educational claim code at scitools.com/pricing and redeem it at licensing.scitools.com.
 - [ ] Links to the group's public GitHub datasets/code and the AI-Estimator tool
 - [ ] The chosen research question and plan, once decided
 - [ ] Advisor guidance, deadlines, and deliverables

@@ -3,7 +3,7 @@
 **Author:** Sky Zheng, Undergraduate Researcher
 **Advisor:** Dr. Ekincan Ufuktepe
 **Institution:** University of Missouri, Columbia
-**Draft version:** 0.4 · **Last updated:** 2026-10-17
+**Draft version:** 0.5 · **Last updated:** 2026-10-17
 
 > **Status:** Living draft. Sections marked `[TBD]` are not written yet. Every update to the project (papers read, decisions made, experiments run, results) goes into the matching section below and gets an entry in the **Revision History** at the end.
 
@@ -135,7 +135,7 @@ Existing work leaves open: [TBD: pick the gap(s) this paper targets, e.g. how mu
 
 ### 3.1 Research Design
 
-**Decision (2026-10-17):** Python is the first target language. This allows direct comparison with the prior code-based study [2] and reuse of its manually labeled CodeSearchNet functions. It also fills the gap that no open-source CK tool covers Python (Section 2.4.1). Java is a likely second language. The planned toolchain is SciTools Understand (CK metrics through `und metrics` and the Python API), pending an educational license. [TBD: rest of design]
+**Decision (2026-10-17):** Python is the first target language. This allows direct comparison with the prior code-based study [2] and reuse of its manually labeled CodeSearchNet functions. It also fills the gap that no open-source CK tool covers Python (Section 2.4.1). Java is a likely second language. The planned toolchain is SciTools Understand (CK metrics through `und metrics` and the Python API), pending an educational license. Understand (Build 1265, macOS arm64) was installed on 2026-10-17, along with the Understand for VS Code extension (v1.1.6); the `und`, `userver`, and `upython` command-line tools are available. A license has not yet been obtained. [TBD: rest of design]
 
 ### 3.2 Datasets
 
@@ -147,7 +147,7 @@ Existing work leaves open: [TBD: pick the gap(s) this paper targets, e.g. how mu
 
 ### 3.4 Training and Experimental Setup
 
-[TBD: hyperparameters, hardware, random seeds, software versions.]
+[TBD: hyperparameters, hardware, random seeds.] Software versions: SciTools Understand Build 1265; Understand for VS Code extension v1.1.6. [TBD: remaining software versions]
 
 ### 3.5 Evaluation Metrics
 
@@ -238,3 +238,4 @@ Planned to match prior work so results can be compared:
 | 2026-10-17 | 0.2     | Added provisional goals G1 (cross-organization generalization) and G2 (language coverage) to Section 1.2. Added Section 2.4 (tool survey for COSMIC and CK metrics, and candidate ways to combine them). Renumbered Research Gap to 2.5. Added references 8 to 20. |
 | 2026-10-17 | 0.3     | Filled in full citations for the three prior papers (refs 1 to 3). Added two related earlier papers by the same group (refs 21, 22). Recorded the decision to start with Python (Section 3.1). |
 | 2026-10-17 | 0.4     | Checked Section 2.3 against the full-text PDFs and corrected it: exact accuracy figures, dataset sizes (1,787 / 2,127), the PRED(30) baseline (≈0.85 sentence level, 0.63 use-case level), and details of the GPT comparison. Fixed the author list for ref 2 (Tenekeci is first author; Küçük), filled in volume/article numbers, and added the SSMB dataset link. Completed refs 21 and 22. |
+| 2026-10-17 | 0.5     | Recorded installation of SciTools Understand (Build 1265) and its VS Code extension (v1.1.6) in Sections 3.1 and 3.5; license still pending. |
