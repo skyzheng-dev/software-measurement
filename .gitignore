@@ -1,2 +1,8 @@
 # Research papers (some are confidential/paywalled; do not commit)
 papers/
+
+# Python virtual environment and caches
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/

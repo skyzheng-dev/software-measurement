@@ -3,7 +3,7 @@
 **Author:** Sky Zheng, Undergraduate Researcher
 **Advisor:** Dr. Ekincan Ufuktepe
 **Institution:** University of Missouri, Columbia
-**Draft version:** 0.5 · **Last updated:** 2026-10-17
+**Draft version:** 0.6 · **Last updated:** 2026-10-17
 
 > **Status:** Living draft. Sections marked `[TBD]` are not written yet. Every update to the project (papers read, decisions made, experiments run, results) goes into the matching section below and gets an entry in the **Revision History** at the end.
 
@@ -147,7 +147,7 @@ Existing work leaves open: [TBD: pick the gap(s) this paper targets, e.g. how mu
 
 ### 3.4 Training and Experimental Setup
 
-[TBD: hyperparameters, hardware, random seeds.] Software versions: SciTools Understand Build 1265; Understand for VS Code extension v1.1.6. [TBD: remaining software versions]
+[TBD: hyperparameters, hardware, random seeds.] Software versions: SciTools Understand Build 1265; Understand for VS Code extension v1.1.6. Python 3.12.12 environment managed with uv (dependencies pinned in `pyproject.toml` and `uv.lock`): PyTorch 2.14.1 (Apple Metal/MPS backend), Transformers 5.20.1, Datasets 5.1.0, scikit-learn 1.9.1, pandas 3.0.6, NumPy 2.5.4, Radon 6.0.1, and Lizard 1.24.1. Hardware: Apple M3, 16 GB RAM. [TBD: remaining software versions]
 
 ### 3.5 Evaluation Metrics
 
@@ -239,3 +239,4 @@ Planned to match prior work so results can be compared:
 | 2026-10-17 | 0.3     | Filled in full citations for the three prior papers (refs 1 to 3). Added two related earlier papers by the same group (refs 21, 22). Recorded the decision to start with Python (Section 3.1). |
 | 2026-10-17 | 0.4     | Checked Section 2.3 against the full-text PDFs and corrected it: exact accuracy figures, dataset sizes (1,787 / 2,127), the PRED(30) baseline (≈0.85 sentence level, 0.63 use-case level), and details of the GPT comparison. Fixed the author list for ref 2 (Tenekeci is first author; Küçük), filled in volume/article numbers, and added the SSMB dataset link. Completed refs 21 and 22. |
 | 2026-10-17 | 0.5     | Recorded installation of SciTools Understand (Build 1265) and its VS Code extension (v1.1.6) in Sections 3.1 and 3.5; license still pending. |
+| 2026-10-17 | 0.6     | Recorded the Python 3.12 environment (uv), library versions, and hardware in Section 3.5. |
