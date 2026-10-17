@@ -14,7 +14,7 @@
   - **G1:** A size measurement tool that can be trained on data from many sources, not one company, and works as accurately as possible for *any* software firm.
   - **G2:** Go beyond Python (code) and English/Turkish (requirements) to other languages.
 - **Formal write-up:** `PAPER.md` (living research paper; see the update rules in `CLAUDE.md`).
-- **Caveat:** Everything in Section 3 comes from a **summary** of the papers, not from the full texts. Exact numbers, author names, and venues should be checked against the original PDFs before they are cited. (Add the PDFs or full citations to this repo when available. See Section 8.)
+- **Sources:** The numbers in Section 3 were **checked against the full-text PDFs** on 2026-10-17. The PDFs are in `papers/`, which is gitignored because two of them are confidential or paywalled. **Never commit or publish them.**
 
 ---
 
@@ -48,31 +48,38 @@
 
 ### Stage 1: Domain-adapted models on requirements (TUBITAK paper)
 - **Question:** Does a domain-adapted model read requirements better than a general one?
-- **Method:** Built **SE-BERT** (English) and **SE-BERTurk** (Turkish) by further pre-training on large software-related corpora. Fine-tuned them on **one real company's requirements dataset**, labeled with COSMIC and MicroM.
-- **Result:** Domain adaptation helps, most of all for Turkish. **SE-BERTurk scored about 69% exact-match accuracy vs. 65.7% for plain BERTurk.**
-- **Limitation:** Proof of concept on a single organization's data.
+- **Method:** Built **SE-BERT** (English) and **SE-BERTurk** (Turkish) by further pre-training on large software-engineering corpora (Stack Overflow, GitHub, Jira, project documentation). Fine-tuned them on a **proprietary, multilingual (Turkish + English), organization-specific requirements dataset**, labeled with COSMIC and MicroM by domain experts. The task is framed as **regression**.
+- **Result:** Domain adaptation helps, most of all for Turkish. **SE-BERTurk: 65.7% → 69.3%** exact-match accuracy over BERTurk. **SE-BERT: 66.9% → 68.2%** over BERT. Both also beat the earlier domain-adapted baselines BERT_SE and RE-BERT.
+- **Limitation:** The dataset comes from a limited number of organizations.
+- **Also in this paper:** the AI-Estimator prototype (by Bilgi Grubu: https://www.bg.com.tr/wp/en/projects/#AI-ESTIMATOR).
 
 ### Stage 2: Measuring size from source code (Automated Software Engineering paper)
 - **Question:** Can size be measured from **code** when there are no written requirements (common in agile teams)?
-- **Method:** **CodeBERT** on **Python functions from CodeSearchNet**. About **1,800 to 2,100 functions** were labeled by hand with COSMIC and MicroM values.
-- **Results:**
-  - Up to **91% per-movement accuracy**.
-  - Aggregated whole-function exact accuracy was lower: **~49% (COSMIC)** and **~44% (MicroM)**.
+- **Method:** **CodeBERT** on **Python functions from CodeSearchNet**. Candidate functions were found by keyword filtering, then labeled by hand: **1,787 functions with COSMIC** and **2,127 with MicroM**.
+- **Results (exact-match accuracy):**
+  - COSMIC per movement: **Entry 67.0%, Read 91.4%, Write 87.6%, Exit 73.1%**. Total CFP: **49.2%** (NMAE 0.273).
+  - MicroM per event type: **Interaction 80.2%, Communication 81.5%, Process 50.9%**. Total MicroM: **44.1%** (NMAE 0.29).
+- **Data availability:** "provided within the manuscript". No GitHub link was found in the paper.
 - **Methodological contribution:** Compared with the group's earlier, rougher attempt, this one used **fully manual, expert-verified labels** and allowed **multiple data movements per function**. That is more realistic and harder.
 - **Limitations:** Described as exploratory and preliminary. Python only, open-source only, not tested on industrial codebases.
 
 ### Stage 3: Real industrial deployment (Journal of Systems & Software paper). The most important stage.
 - **Question:** Do these models hold up in real companies?
-- **Data:** Real requirement documents from **two organizations**: an industrial automation firm and a large tech/aviation company.
-- **Models:** BERT and SE-BERT, compared against **GPT-4o, GPT-o3, and GPT-o4-mini-high (zero-shot)**.
+- **Data:** Real requirement documents from **two organizations**, measured by experienced analysts:
+  - **Case 1:** an industrial automation firm (25+ years, 100+ staff).
+  - **Case 2:** a global tech company focused on aviation (2,500+ staff).
+  - The heterogeneous dataset is public at **https://github.com/smtnkc/SSMB**.
+- **Models:** BERT and SE-BERT, evaluated at both use-case level and sentence level.
+- **GPT comparison:** GPT-4o, o3, and o4-mini-high were tested **zero-shot with COSMIC/MicroM background given in the prompt**, as a pre-evaluation on the heterogeneous use-case dataset (633 samples) only.
 - **Three scenarios:**
   1. **Generic model:** trained on a mix of requirements from **26 open-source projects**.
   2. **External evaluation:** the generic model applied unchanged to a new company's requirements.
   3. **Internal evaluation:** a model trained on **one company's own requirements**.
 - **Results:**
-  - **Generic models fail in the real world.** In external evaluation, PRED(30) fell **below 20%** in some cases, against about **85%** in controlled lab settings.
-  - **Organization-specific training restores accuracy.** MMRE improved by **up to 65% (0.53 to 0.18)** when moving from generic to organization-specific training.
-  - **Fine-tuned BERT models beat zero-shot GPT models by about 3x in accuracy.** For this structured task, a small fine-tuned model still wins over large general LLMs.
+  - **Generic models fail in the real world.** In external evaluation, total-COSMIC PRED(30) was **0.1129 (Case 1)** and **0.1240 (Case 2)**, with MMRE above 0.50. The same generic models scored PRED(30) **≈0.85 at sentence level** (CFP 0.8591, MicroM 0.8478) and **≈0.63 at use-case level** when tested on data like their training data.
+  - **Organization-specific training restores accuracy.** MMRE improved by **up to 65% (0.5268 → 0.1821)**. SE-BERT beat BERT by up to 7% on organization-specific data (0.1948 → 0.1821).
+  - **Fine-tuned BERT models beat zero-shot GPT models by more than 3x.** CFP PRED(30) was 0.6382 for SE-BERT vs. 0.2164 for o4-mini-high, the best GPT model; GPT-4o scored 0.0964. For MicroM it was 0.6408 vs. 0.2104.
+  - **Domain misalignment outweighs domain adaptation.** In external evaluation, SE-BERT showed no clear advantage over BERT.
 
 ### Summary table
 
@@ -130,8 +137,13 @@ Full details and citations are in `PAPER.md` Section 2.4.
 
 ## 8. To add to this repo (TODO)
 
-- [ ] Full citations (authors, year, venue, DOI) for all three papers
-- [ ] PDFs or notes from reading the full texts (check the numbers in Section 3)
+- [x] Full citations for all three papers (in `PAPER.md` References 1 to 3). The group is **Ünlü, Tenekeci, Demirörs et al.** (Izmir Institute of Technology).
+  - TUBITAK: DOI 10.55730/1300-0632.4172 (open access)
+  - ASE: DOI 10.1007/s10515-025-00571-z
+  - JSS: DOI 10.1016/j.jss.2025.112638
+- [x] All five PDFs are in `papers/` (gitignored), and the numbers in Section 3 are checked. Also there: IWSM 2024 (CodeBERT on Python + **C#**) and SEAA 2024 (BERT on user stories).
+- [ ] Read IWSM 2024 in depth, since its C# dataset is relevant to G2.
+- [x] Decision: **Python is the first language** (2026-10-17). Understand license still pending (user will apply later).
 - [ ] Links to the group's public GitHub datasets/code and the AI-Estimator tool
 - [ ] The chosen research question and plan, once decided
 - [ ] Advisor guidance, deadlines, and deliverables

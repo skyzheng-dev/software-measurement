@@ -3,7 +3,7 @@
 **Author:** Sky Zheng, Undergraduate Researcher
 **Advisor:** Dr. Ekincan Ufuktepe
 **Institution:** University of Missouri, Columbia
-**Draft version:** 0.2 · **Last updated:** 2026-10-17
+**Draft version:** 0.4 · **Last updated:** 2026-10-17
 
 > **Status:** Living draft. Sections marked `[TBD]` are not written yet. Every update to the project (papers read, decisions made, experiments run, results) goes into the matching section below and gets an entry in the **Revision History** at the end.
 
@@ -66,13 +66,13 @@ BERT-style transformer models can be adapted to a field by further pre-training 
 
 ### 2.3 Prior Work on Automated Size Measurement
 
-A single research group has studied this problem in three stages [TBD: citations]:
+The research group of Ünlü, Tenekeci, Demirörs, and colleagues at the Izmir Institute of Technology has studied this problem in several steps. Early exploratory studies fine-tuned BERT and BERT_SE on user stories, reaching 72.8% and 74.4% accuracy for total COSMIC size [22]. They also fine-tuned CodeBERT on 4,800 Python and 1,100 C# functions [21]. Three later studies form the basis of this project:
 
-1. **Requirements-based measurement with domain-adapted models** [TUBITAK paper, TBD cite]. SE-BERT and SE-BERTurk were fine-tuned on one company's requirements labeled with COSMIC and MicroM. SE-BERTurk reached about 69% exact-match accuracy vs. 65.7% for plain BERTurk. This showed a modest benefit from domain adaptation, but on a single organization's data.
+1. **Requirements-based measurement with domain-adapted models** [1]. SE-BERT (English) and SE-BERTurk (Turkish) were pre-trained on software-engineering corpora and fine-tuned, as regressors, on a proprietary, multilingual, organization-specific requirements dataset labeled with COSMIC and MicroM by domain experts. SE-BERTurk improved exact-match accuracy from 65.7% to 69.3% over BERTurk, and SE-BERT improved it from 66.9% to 68.2% over BERT. Both also outperformed the earlier domain-adapted baselines BERT_SE and RE-BERT.
 
-2. **Code-based measurement** [Automated Software Engineering paper, TBD cite]. CodeBERT was applied to about 1,800 to 2,100 manually labeled Python functions from CodeSearchNet, with multiple data movements allowed per function. It reached up to 91% per-movement accuracy, but whole-function exact accuracy was only about 49% (COSMIC) and 44% (MicroM). The study was exploratory: Python only, open-source only.
+2. **Code-based measurement** [2]. CodeBERT was fine-tuned on Python functions from CodeSearchNet, manually labeled with COSMIC (1,787 functions) and MicroM (2,127 functions), with multiple data movements allowed per function. Per-movement exact-match accuracy was 67.0% (Entry), 73.1% (Exit), 87.6% (Write), and 91.4% (Read). MicroM event-type accuracy reached 81.5%. Accuracy for the aggregated total was lower: 49.2% for CFP (NMAE 0.273) and 44.1% for MicroM (NMAE 0.29). The study was exploratory and limited to open-source Python.
 
-3. **Industrial evaluation** [Journal of Systems & Software paper, TBD cite]. BERT and SE-BERT were evaluated on requirements from two companies (industrial automation; tech/aviation) under three settings: a generic model trained on 26 open-source projects, the same generic model applied to a new organization (external), and organization-specific training (internal). Generic models collapsed in the external setting (PRED(30) below 20% in some cases, vs. about 85% in the lab). Organization-specific training improved MMRE by up to 65% (0.53 to 0.18). Fine-tuned models beat zero-shot GPT-4o, GPT-o3, and GPT-o4-mini-high by about 3x in accuracy.
+3. **Industrial evaluation** [3]. BERT and SE-BERT were evaluated on requirements from two organizations, an industrial automation company (Case 1) and a global technology company focused on aviation (Case 2), under three settings: generic (trained and tested on a heterogeneous dataset from 26 open-source specifications, publicly released as SSMB), external (the generic model applied to organization data), and internal (trained and tested on organization data). The generic models reached PRED(30) ≈ 0.85 at sentence level (0.63 at use-case level). In external evaluation, PRED(30) for total COSMIC fell to 0.1129 (Case 1) and 0.1240 (Case 2), with MMRE above 0.50. Organization-specific training lowered MMRE by up to 65% (0.5268 → 0.1821). In external evaluation, SE-BERT showed no clear advantage over BERT, which the authors read as domain misalignment outweighing domain-adaptive pre-training. In a zero-shot pre-evaluation with COSMIC/MicroM background supplied in the prompt (633 heterogeneous use cases), the best GPT model (o4-mini-high) reached a CFP PRED(30) of 0.2164, versus 0.6382 for SE-BERT, a gap of more than 3x.
 
 ### 2.4 Tool Support for COSMIC and CK Metrics
 
@@ -135,7 +135,7 @@ Existing work leaves open: [TBD: pick the gap(s) this paper targets, e.g. how mu
 
 ### 3.1 Research Design
 
-[TBD]
+**Decision (2026-10-17):** Python is the first target language. This allows direct comparison with the prior code-based study [2] and reuse of its manually labeled CodeSearchNet functions. It also fills the gap that no open-source CK tool covers Python (Section 2.4.1). Java is a likely second language. The planned toolchain is SciTools Understand (CK metrics through `und metrics` and the Python API), pending an educational license. [TBD: rest of design]
 
 ### 3.2 Datasets
 
@@ -197,11 +197,11 @@ Planned to match prior work so results can be compared:
 
 ## References
 
-> Fill in full citations (authors, year, title, venue, DOI). Numbers cited in Section 2.3 come from a summary and must be checked against the original papers.
+> Numbers in Section 2.3 were checked against the full texts of [1], [2], [3], [21], and [22] on 2026-10-17. Local copies are in `papers/` (gitignored and confidential; do not commit or redistribute).
 
-1. [TBD] SE-BERT / SE-BERTurk for COSMIC and MicroM measurement from requirements. _TUBITAK-related publication._
-2. [TBD] CodeBERT-based software size measurement from Python source code. _Automated Software Engineering._
-3. [TBD] Industrial evaluation of BERT-based size measurement across organizations. _Journal of Systems and Software._
+1. S. Tenekeci, H. Ünlü, B. Keçeci, M. E. İncir, O. Demirörs, "Automated software size measurement using multilingual domain-adapted language models," _Turkish Journal of Electrical Engineering and Computer Sciences_, 34(2), 234–247, 2026. DOI: 10.55730/1300-0632.4172. Open access: https://journals.tubitak.gov.tr/elektrik/vol34/iss2/5/
+2. S. Tenekeci, H. Ünlü, B. A. Gül, D. Keleş, M. Küçük, O. Demirörs, "Automating software size measurement from Python code using language models," _Automated Software Engineering_, 33, 19, 2026. DOI: 10.1007/s10515-025-00571-z
+3. H. Ünlü, S. Tenekeci, D. E. Kennouche, O. Demirörs, "Automating software size measurement with language models: Insights from industrial case studies," _Journal of Systems and Software_, 231, 112638, 2026. DOI: 10.1016/j.jss.2025.112638. Dataset: https://github.com/smtnkc/SSMB
 4. COSMIC Measurement Manual / ISO/IEC 19761. [TBD: exact version]
 5. Devlin et al., "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding," NAACL 2019.
 6. Feng et al., "CodeBERT: A Pre-Trained Model for Programming and Natural Languages," Findings of EMNLP 2020.
@@ -219,6 +219,8 @@ Planned to match prior work so results can be compared:
 18. "CosmiCode: Automated COSMIC Measurement Tool for Arduino Using RegEx and NLP," Springer, 2025. https://link.springer.com/chapter/10.1007/978-3-031-82377-0_26
 19. ScopeMaster: automated COSMIC measurement from requirements. https://cosmic-sizing.org/publications/automated-software-estimation-with-scopemaster/
 20. cosmic-sizing-tool. https://github.com/cosmic-sizing-tool/cosmic-sizing-tool
+21. S. Tenekeci, H. Ünlü, E. Dikenelli, U. Selçuk, G. Kılınç Soylu, O. Demirörs, "Predicting Software Size and Effort from Code Using Natural Language Processing," IWSM-Mensura 2024, CEUR-WS Vol-3852. https://ceur-ws.org/Vol-3852/paper1.pdf
+22. H. Ünlü, S. Tenekeci, C. Çiftçi, İ. B. Oral, T. Atalay, T. Hacaloğlu, B. Musaoğlu, O. Demirörs, "Predicting Software Functional Size Using Natural Language Processing: An Exploratory Case Study," _50th Euromicro SEAA_, pp. 188–193, IEEE, 2024. DOI: 10.1109/SEAA64295.2024.00036
 
 ---
 
@@ -234,3 +236,5 @@ Planned to match prior work so results can be compared:
 | ---------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 2026-10-17 | 0.1     | Created paper skeleton. Wrote Introduction motivation and Background/Related Work (Section 2) from the summary of the prior three-stage research. |
 | 2026-10-17 | 0.2     | Added provisional goals G1 (cross-organization generalization) and G2 (language coverage) to Section 1.2. Added Section 2.4 (tool survey for COSMIC and CK metrics, and candidate ways to combine them). Renumbered Research Gap to 2.5. Added references 8 to 20. |
+| 2026-10-17 | 0.3     | Filled in full citations for the three prior papers (refs 1 to 3). Added two related earlier papers by the same group (refs 21, 22). Recorded the decision to start with Python (Section 3.1). |
+| 2026-10-17 | 0.4     | Checked Section 2.3 against the full-text PDFs and corrected it: exact accuracy figures, dataset sizes (1,787 / 2,127), the PRED(30) baseline (≈0.85 sentence level, 0.63 use-case level), and details of the GPT comparison. Fixed the author list for ref 2 (Tenekeci is first author; Küçük), filled in volume/article numbers, and added the SSMB dataset link. Completed refs 21 and 22. |

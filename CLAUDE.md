@@ -6,6 +6,10 @@ Full background, glossary, prior findings, and open directions:
 
 @RESEARCH_CONTEXT.md
 
+## Confidentiality
+
+`papers/` holds the source PDFs. Some are confidential or paywalled. The folder is gitignored: never commit, upload, publish, or quote large passages from these files outside this machine.
+
 ## Documentation rules (always follow)
 
 `PAPER.md` is the project's living documentation, written as a research paper. Whenever a session makes progress, update it **in the same session**:
