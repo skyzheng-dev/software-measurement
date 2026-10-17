@@ -9,8 +9,12 @@
 
 - **Who:** An undergraduate researcher studying **software measurement**: how we work out the worth of software and how it can be measured.
 - **Starting point:** The researcher was given an existing body of work (three papers from one research group) that looks at **automating software size measurement with language models**. The goal is to **build on that work**.
-- **Status:** Early stage. So far the prior work has been understood and summarized (below). No new experiments, code, or datasets have been produced in this repo yet.
-- **Caveat:** Everything in Section 3 comes from a **summary** of the papers, not from the full texts. Exact numbers, author names, and venues should be checked against the original PDFs before they are cited. (Add the PDFs or full citations to this repo when available. See Section 7.)
+- **Status:** Early stage. The prior work has been summarized (below), and a tool survey of COSMIC and CK metrics is done (Section 7). No experiments, code, or datasets exist in this repo yet. **The user asked that nothing be implemented until they say so.**
+- **Current goals (provisional, may change):**
+  - **G1:** A size measurement tool that can be trained on data from many sources, not one company, and works as accurately as possible for *any* software firm.
+  - **G2:** Go beyond Python (code) and English/Turkish (requirements) to other languages.
+- **Formal write-up:** `PAPER.md` (living research paper; see the update rules in `CLAUDE.md`).
+- **Caveat:** Everything in Section 3 comes from a **summary** of the papers, not from the full texts. Exact numbers, author names, and venues should be checked against the original PDFs before they are cited. (Add the PDFs or full citations to this repo when available. See Section 8.)
 
 ---
 
@@ -114,7 +118,17 @@ These are candidate directions drawn from the limitations above. **None has been
 
 ---
 
-## 7. To add to this repo (TODO)
+## 7. Tool survey: COSMIC + CK metrics (2026-10-17)
+
+Full details and citations are in `PAPER.md` Section 2.4.
+
+- **No single tool, IDE, or plugin computes both COSMIC and CK.**
+- **CK tools:** SciTools Understand (commercial, free educational license, 17+ languages, Python plugin API), Analizo (free; C/C++/Java/C#), CK by Aniche (free; Java source), CKJM-extended (free; Java bytecode). No good open-source CK tool for Python. Different tools compute the same metric differently.
+- **COSMIC from code:** Only academic prototypes, mostly Java (COSMIC Solver at 77% agreement with manual counts, JavaCFP, CFP4J) and C (regex), plus Arduino and assembly. Nothing for Python, C#, or JS. ScopeMaster (commercial) works from requirements text, not code.
+- **Ways to combine (none chosen yet):** (1) Understand plus a custom COSMIC plugin, (2) open-source CK tools joined with COSMIC labels or predictions, (3) CK metrics as extra features next to CodeBERT embeddings to test cross-organization generalization (G1), (4) CK distributions to describe how companies' codebases differ.
+- **Main obstacle:** Unit mismatch. COSMIC counts per *functional process* (≈ an entry-point method); CK metrics are per *class*.
+
+## 8. To add to this repo (TODO)
 
 - [ ] Full citations (authors, year, venue, DOI) for all three papers
 - [ ] PDFs or notes from reading the full texts (check the numbers in Section 3)
