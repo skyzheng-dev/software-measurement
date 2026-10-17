@@ -141,7 +141,14 @@ Full details and citations are in `PAPER.md` Section 2.4.
   - TUBITAK: DOI 10.55730/1300-0632.4172 (open access)
   - ASE: DOI 10.1007/s10515-025-00571-z
   - JSS: DOI 10.1016/j.jss.2025.112638
-- [x] All five PDFs are in `papers/` (gitignored), and the numbers in Section 3 are checked. Also there: IWSM 2024 (CodeBERT on Python + **C#**) and SEAA 2024 (BERT on user stories).
+- [x] All five PDFs are in `papers/` (gitignored), named `Year_FirstAuthor_Venue_Topic.pdf`. The number in brackets is the paper's number in the `PAPER.md` reference list:
+  - `2024_Unlu_SEAA_...` = [22]
+  - `2024_Tenekeci_IWSM_...` = [21]
+  - `2026_Tenekeci_TJEECS_...` = [1] (Stage 1)
+  - `2026_Tenekeci_ASE_...` = [2] (Stage 2)
+  - `2026_Unlu_JSS_...` = [3] (Stage 3)
+
+  The numbers in Section 3 are checked. Also there: IWSM 2024 (CodeBERT on Python + **C#**) and SEAA 2024 (BERT on user stories).
 - [ ] Read IWSM 2024 in depth, since its C# dataset is relevant to G2.
 - [x] Decision: **Python is the first language** (2026-10-17). Understand license still pending (user will apply later).
 - [ ] Links to the group's public GitHub datasets/code and the AI-Estimator tool
