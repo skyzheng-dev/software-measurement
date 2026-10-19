@@ -6,3 +6,6 @@ papers/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+
+# macOS Finder metadata
+.DS_Store
