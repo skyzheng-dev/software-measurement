@@ -9,3 +9,12 @@ __pycache__/
 
 # macOS Finder metadata
 .DS_Store
+
+# Datasets and generated tool output (large, rebuildable)
+data/
+# Joern shell workspace and CPG files
+workspace/
+*.cpg
+cpg.bin
+# Understand project databases
+*.und/

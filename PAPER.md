@@ -135,7 +135,7 @@ Existing work leaves open: [TBD: pick the gap(s) this paper targets, e.g. how mu
 
 ### 3.1 Research Design
 
-**Decision (2026-10-17):** Python is the first target language. This allows direct comparison with the prior code-based study [2] and reuse of its manually labeled CodeSearchNet functions. It also fills the gap that no open-source CK tool covers Python (Section 2.4.1). Java is a likely second language. The planned toolchain is SciTools Understand (CK metrics through `und metrics` and the Python API), pending an educational license. Understand (Build 1265, macOS arm64) was installed on 2026-10-17, along with the Understand for VS Code extension (v1.1.6); the `und`, `userver`, and `upython` command-line tools are available. A license has not yet been obtained. [TBD: rest of design]
+**Decision (2026-10-17):** Python is the first target language. This allows direct comparison with the prior code-based study [2] and reuse of its manually labeled CodeSearchNet functions. It also fills the gap that no open-source CK tool covers Python (Section 2.4.1). Java is a likely second language. The planned toolchain is SciTools Understand (CK metrics through `und metrics` and the Python API), pending an educational license. Understand (Build 1265, macOS arm64) was installed on 2026-10-17, along with the Understand for VS Code extension (v1.1.6); the `und`, `userver`, and `upython` command-line tools are available. A license has not yet been obtained. Joern 4.0.665 [23] was installed on 2026-10-25 to obtain per-method program dependence graphs (PDGs) from source code; its Python frontend (`pysrc2cpg`) was verified on a sample function, producing data- and control-dependence edges together with parameter, call, and return nodes that are candidate signals for COSMIC Entry, Read, Write, and Exit movements. Whether PDG-derived features will be used in the models has not been decided. [TBD: rest of design]
 
 ### 3.2 Datasets
 
@@ -147,7 +147,7 @@ Existing work leaves open: [TBD: pick the gap(s) this paper targets, e.g. how mu
 
 ### 3.4 Training and Experimental Setup
 
-[TBD: hyperparameters, hardware, random seeds.] Software versions: SciTools Understand Build 1265; Understand for VS Code extension v1.1.6. Python 3.12.12 environment managed with uv (dependencies pinned in `pyproject.toml` and `uv.lock`): PyTorch 2.14.1 (Apple Metal/MPS backend), Transformers 5.20.1, Datasets 5.1.0, scikit-learn 1.9.1, pandas 3.0.6, NumPy 2.5.4, Radon 6.0.1, and Lizard 1.24.1. Hardware: Apple M3, 16 GB RAM. [TBD: remaining software versions]
+[TBD: hyperparameters, hardware, random seeds.] Software versions: SciTools Understand Build 1265; Joern 4.0.665 on OpenJDK 21.0.13 (Homebrew); Understand for VS Code extension v1.1.6. Python 3.12.12 environment managed with uv (dependencies pinned in `pyproject.toml` and `uv.lock`): PyTorch 2.14.1 (Apple Metal/MPS backend), Transformers 5.20.1, Datasets 5.1.0, scikit-learn 1.9.1, pandas 3.0.6, NumPy 2.5.4, Radon 6.0.1, and Lizard 1.24.1. Hardware: Apple M3, 16 GB RAM. [TBD: remaining software versions]
 
 ### 3.5 Evaluation Metrics
 
@@ -221,6 +221,7 @@ Planned to match prior work so results can be compared:
 20. cosmic-sizing-tool. https://github.com/cosmic-sizing-tool/cosmic-sizing-tool
 21. S. Tenekeci, H. Ünlü, E. Dikenelli, U. Selçuk, G. Kılınç Soylu, O. Demirörs, "Predicting Software Size and Effort from Code Using Natural Language Processing," IWSM-Mensura 2024, CEUR-WS Vol-3852. https://ceur-ws.org/Vol-3852/paper1.pdf
 22. H. Ünlü, S. Tenekeci, C. Çiftçi, İ. B. Oral, T. Atalay, T. Hacaloğlu, B. Musaoğlu, O. Demirörs, "Predicting Software Functional Size Using Natural Language Processing: An Exploratory Case Study," _50th Euromicro SEAA_, pp. 188–193, IEEE, 2024. DOI: 10.1109/SEAA64295.2024.00036
+23. F. Yamaguchi, N. Golde, D. Arp, K. Rieck, "Modeling and Discovering Vulnerabilities with Code Property Graphs," _IEEE Symposium on Security and Privacy_, 2014. Tool: Joern, https://github.com/joernio/joern
 
 ---
 
@@ -240,3 +241,4 @@ Planned to match prior work so results can be compared:
 | 2026-10-17 | 0.4     | Checked Section 2.3 against the full-text PDFs and corrected it: exact accuracy figures, dataset sizes (1,787 / 2,127), the PRED(30) baseline (≈0.85 sentence level, 0.63 use-case level), and details of the GPT comparison. Fixed the author list for ref 2 (Tenekeci is first author; Küçük), filled in volume/article numbers, and added the SSMB dataset link. Completed refs 21 and 22. |
 | 2026-10-17 | 0.5     | Recorded installation of SciTools Understand (Build 1265) and its VS Code extension (v1.1.6) in Sections 3.1 and 3.5; license still pending. |
 | 2026-10-17 | 0.6     | Recorded the Python 3.12 environment (uv), library versions, and hardware in Section 3.5. |
+| 2026-10-25 | 0.7     | Recorded installation of Joern 4.0.665 (with OpenJDK 21) for PDG extraction in Sections 3.1 and 3.4; added ref 23. |

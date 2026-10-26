@@ -1,7 +1,7 @@
 # Research Context: Automated Software Size Measurement
 
 > **Purpose of this file:** Give any future session (human or AI) the background needed to continue this project without re-explaining it.
-> **Last updated:** 2026-10-17
+> **Last updated:** 2026-10-25
 
 ---
 
@@ -152,6 +152,8 @@ Full details and citations are in `PAPER.md` Section 2.4.
 - [ ] Read IWSM 2024 in depth, since its C# dataset is relevant to G2.
 - [x] Decision: **Python is the first language** (2026-10-17). Understand **installed** 2026-10-17 (Build 1265, `und`/`userver`/`upython` on PATH via `~/.zshrc`, plus VS Code extension v1.1.6). **License still pending:** get a trial or educational claim code at scitools.com/pricing and redeem it at licensing.scitools.com.
 - [x] Python environment set up 2026-10-17: Python 3.12 via uv (`pyproject.toml`, `uv.lock`, `.venv/` gitignored) with torch (MPS works on the M3), transformers, datasets, scikit-learn, pandas, numpy, radon, lizard. Run code with `uv run python ...`.
+- [x] Joern installed 2026-10-25 for **PDG (program dependence graph)** extraction: Joern 4.0.665 at `~/tools/joern/joern-cli` (outside the repo, ~1.9 GB), OpenJDK 21 via Homebrew, `coreutils` (for `greadlink`). Python frontend verified on `tools/joern/sample.py`. Run `tools/joern/export_pdg.sh <src> <out>` to get one `.dot` PDG per method. Note: the export also writes empty stub PDGs for external calls (`print`, `execute`, ...), so filter to real functions. **Using PDG features in the models is not decided yet.**
+- Repo layout (2026-10-25): `tools/joern/` and `tools/understand/` hold our own scripts for each tool (the tool binaries live outside the repo); `data/raw/` and `data/derived/` are gitignored (datasets, CPGs, PDG exports, `.und` databases).
 - [ ] Links to the group's public GitHub datasets/code and the AI-Estimator tool
 - [ ] The chosen research question and plan, once decided
 - [ ] Advisor guidance, deadlines, and deliverables
