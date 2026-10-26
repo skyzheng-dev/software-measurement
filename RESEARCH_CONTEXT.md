@@ -9,7 +9,8 @@
 
 - **Who:** An undergraduate researcher studying **software measurement**: how we work out the worth of software and how it can be measured.
 - **Starting point:** The researcher was given an existing body of work (three papers from one research group) that looks at **automating software size measurement with language models**. The goal is to **build on that work**.
-- **Status:** Early stage. The prior work has been summarized (below), and a tool survey of COSMIC and CK metrics is done (Section 7). No experiments, code, or datasets exist in this repo yet. **The user asked that nothing be implemented until they say so.**
+- **Status:** Early stage. The prior work has been summarized (below), and a tool survey of COSMIC and CK metrics is done (Section 7). Tooling is set up (Python env, Understand, Joern for PDGs; see Section 8), but no experiments, models, or datasets exist yet. **The user asked that nothing be implemented until they say so.** Installing tools was explicitly requested; research code was not.
+- **Where we left off (2026-10-26):** Joern + PDG setup is finished and committed (`acc2dbb`). `JAVA_HOME` and the Joern PATH are in `~/.zshrc`, verified in a fresh shell. Not yet installed: `networkx` + `pydot` for reading `.dot` PDGs in Python (`uv add networkx pydot` when feature extraction starts). Still open: Understand license, choosing the research question, and deciding whether PDG features feed the models.
 - **Current goals (provisional, may change):**
   - **G1:** A size measurement tool that can be trained on data from many sources, not one company, and works as accurately as possible for *any* software firm.
   - **G2:** Go beyond Python (code) and English/Turkish (requirements) to other languages.
