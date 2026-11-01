@@ -1,7 +1,7 @@
 # Research Context: Automated Software Size Measurement
 
 > **Purpose of this file:** Give any future session (human or AI) the background needed to continue this project without re-explaining it.
-> **Last updated:** 2026-10-25
+> **Last updated:** 2026-11-01
 
 ---
 
@@ -10,7 +10,7 @@
 - **Who:** An undergraduate researcher studying **software measurement**: how we work out the worth of software and how it can be measured.
 - **Starting point:** The researcher was given an existing body of work (three papers from one research group) that looks at **automating software size measurement with language models**. The goal is to **build on that work**.
 - **Status:** Early stage. The prior work has been summarized (below), and a tool survey of COSMIC and CK metrics is done (Section 7). Tooling is set up (Python env, Understand, Joern for PDGs; see Section 8), but no experiments, models, or datasets exist yet. **The user asked that nothing be implemented until they say so.** Installing tools was explicitly requested; research code was not.
-- **Where we left off (2026-10-26):** Joern + PDG setup is finished and committed (`acc2dbb`). `JAVA_HOME` and the Joern PATH are in `~/.zshrc`, verified in a fresh shell. Not yet installed: `networkx` + `pydot` for reading `.dot` PDGs in Python (`uv add networkx pydot` when feature extraction starts). Still open: Understand license, choosing the research question, and deciding whether PDG features feed the models.
+- **Where we left off (2026-10-26):** Joern + PDG setup is finished and committed (`acc2dbb`). `JAVA_HOME` and the Joern PATH are in `~/.zshrc`, verified in a fresh shell. Not yet installed: `networkx` + `pydot` for reading `.dot` PDGs in Python (`uv add networkx pydot` when feature extraction starts). Understand license activated 2026-11-01 (valid to 2027-10-26; verified with `und license` and a test `und metrics` run, which gives per-function metrics for Python). Still open: choosing the research question, and deciding whether PDG features feed the models.
 - **Current goals (provisional, may change):**
   - **G1:** A size measurement tool that can be trained on data from many sources, not one company, and works as accurately as possible for *any* software firm.
   - **G2:** Go beyond Python (code) and English/Turkish (requirements) to other languages.
@@ -151,7 +151,7 @@ Full details and citations are in `PAPER.md` Section 2.4.
 
   The numbers in Section 3 are checked. Also there: IWSM 2024 (CodeBERT on Python + **C#**) and SEAA 2024 (BERT on user stories).
 - [ ] Read IWSM 2024 in depth, since its C# dataset is relevant to G2.
-- [x] Decision: **Python is the first language** (2026-10-17). Understand **installed** 2026-10-17 (Build 1265, `und`/`userver`/`upython` on PATH via `~/.zshrc`, plus VS Code extension v1.1.6). **License still pending:** get a trial or educational claim code at scitools.com/pricing and redeem it at licensing.scitools.com.
+- [x] Decision: **Python is the first language** (2026-10-17). Understand **installed** 2026-10-17 (Build 1265, `und`/`userver`/`upython` on PATH via `~/.zshrc`, plus VS Code extension v1.1.6). **License activated 2026-11-01**, valid to 2027-10-26 (an earlier trial code had expired 2026-10-29). Check with `und license`.
 - [x] Python environment set up 2026-10-17: Python 3.12 via uv (`pyproject.toml`, `uv.lock`, `.venv/` gitignored) with torch (MPS works on the M3), transformers, datasets, scikit-learn, pandas, numpy, radon, lizard. Run code with `uv run python ...`.
 - [x] Joern installed 2026-10-25 for **PDG (program dependence graph)** extraction: Joern 4.0.665 at `~/tools/joern/joern-cli` (outside the repo, ~1.9 GB), OpenJDK 21 via Homebrew, `coreutils` (for `greadlink`). Python frontend verified on `tools/joern/sample.py`. Run `tools/joern/export_pdg.sh <src> <out>` to get one `.dot` PDG per method. Note: the export also writes empty stub PDGs for external calls (`print`, `execute`, ...), so filter to real functions. **Using PDG features in the models is not decided yet.**
 - Repo layout (2026-10-25): `tools/joern/` and `tools/understand/` hold our own scripts for each tool (the tool binaries live outside the repo); `data/raw/` and `data/derived/` are gitignored (datasets, CPGs, PDG exports, `.und` databases).
