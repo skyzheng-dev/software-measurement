@@ -3,7 +3,7 @@
 **Author:** Sky Zheng, Undergraduate Researcher
 **Advisor:** Dr. Ekincan Ufuktepe
 **Institution:** University of Missouri, Columbia
-**Draft version:** 0.6 · **Last updated:** 2026-10-17
+**Draft version:** 0.9 · **Last updated:** 2026-11-01
 
 > **Status:** Living draft. Sections marked `[TBD]` are not written yet. Every update to the project (papers read, decisions made, experiments run, results) goes into the matching section below and gets an entry in the **Revision History** at the end.
 
@@ -34,19 +34,28 @@ This project has two goals. Both are **provisional** and may be revised as the w
 - **G1 (Cross-organization generalization):** Develop a software size measurement tool that can be trained on data from many sources, not one company's data, and that measures size as accurately as possible for any software organization.
 - **G2 (Language coverage):** Extend automated measurement beyond Python, English, and Turkish to other programming languages and natural languages.
 
-As a first exploratory step toward these goals, this work examines whether COSMIC functional size and Chidamber and Kemerer (CK) object-oriented metrics can be computed together within one toolchain (Section 2.4). The hypothesis is that structural code metrics, which do not depend on an organization's writing style, may serve as complementary signals for size models that must generalize across organizations. [TBD: refine into the specific problem this project tackles.]
+As a first exploratory step toward these goals, this work examines whether COSMIC functional size and Chidamber and Kemerer (CK) object-oriented metrics can be computed together within one toolchain (Section 2.4). The hypothesis is that structural code metrics, which do not depend on an organization's writing style, may serve as complementary signals for size models that must generalize across organizations.
+
+**Selected problem (2026-11-01, provisional pending advisor confirmation):** The code-based model of prior work [2] reads a function only as a token sequence. It is least accurate on Entry (67.0%) and Exit (73.1%), the movements that cross the boundary between the software and its users, and it was evaluated only on random splits of a single pooled dataset. This project asks whether explicit structural information about the code, namely program dependence graphs (PDGs) extracted with Joern and static metrics computed with SciTools Understand, improves CodeBERT's COSMIC size estimates, and whether any improvement persists when the model is tested on projects it has not seen during training (G1).
 
 ### 1.3 Research Questions
 
-- **RQ1:** [TBD]
-- **RQ2:** [TBD]
-- **RQ3:** [TBD]
+Provisional (2026-11-01), pending advisor confirmation:
 
-_Candidate directions are listed in `RESEARCH_CONTEXT.md` Section 6._
+- **RQ1:** Does augmenting CodeBERT with structural features (PDG-derived features from Joern and static metrics from Understand) improve exact-match accuracy, MMRE, and PRED(30) for COSMIC Entry, Exit, Read, Write, and total CFP on Python functions, compared with CodeBERT on code text alone?
+- **RQ2:** Does any such improvement persist, or grow, under a project-held-out evaluation in which test functions come from repositories not seen during training, compared with the random split used in prior work [2]?
+- **RQ3:** Which structural features contribute most to each data-movement type? [TBD: confirm whether RQ3 is in scope.]
+
+_Other candidate directions are listed in `RESEARCH_CONTEXT.md` Section 6._
 
 ### 1.4 Contributions
 
-[TBD: bullet list of what this work adds.]
+Planned (provisional):
+
+- A comparison of text-only and structure-augmented CodeBERT models for COSMIC measurement from Python code, using the publicly released labeled dataset of [2].
+- A project-held-out evaluation of code-based COSMIC measurement, which prior work has not reported.
+- A reproducible pipeline that extracts per-function PDG features (Joern) and static metrics (Understand) from Python code.
+- [TBD]
 
 ### 1.5 Paper Organization
 
@@ -127,7 +136,7 @@ COSMIC and CK measure different things: *how much functionality* versus *how the
 
 ### 2.5 Research Gap
 
-Existing work leaves open: [TBD: pick the gap(s) this paper targets, e.g. how much organizational data is needed, cross-language code measurement, few-shot LLM baselines, joint prediction of E/X/R/W, a public benchmark.] Section 2.4 adds a further gap: **no tool combines functional size (COSMIC) with structural metrics (CK)**, and code-based COSMIC automation is still language-specific and mostly limited to Java and C.
+Existing work leaves open several questions. This paper targets two of them (2026-11-01, provisional): (a) code-based COSMIC models [2] use code only as text and have not been combined with explicit structural program representations, and (b) code-based models have been evaluated only on random splits, so their accuracy on code from unseen projects is unknown. This second gap is the code-side counterpart of the cross-organization failure observed for requirements in [3]. Other open questions (the amount of organizational data needed, cross-language measurement, few-shot LLM baselines, joint prediction of E/X/R/W, a shared benchmark) are left for future work. Section 2.4 adds a further gap: **no tool combines functional size (COSMIC) with structural metrics (CK)**, and code-based COSMIC automation is still language-specific and mostly limited to Java and C.
 
 ---
 
@@ -135,11 +144,20 @@ Existing work leaves open: [TBD: pick the gap(s) this paper targets, e.g. how mu
 
 ### 3.1 Research Design
 
-**Decision (2026-10-17):** Python is the first target language. This allows direct comparison with the prior code-based study [2] and reuse of its manually labeled CodeSearchNet functions. It also fills the gap that no open-source CK tool covers Python (Section 2.4.1). Java is a likely second language. The planned toolchain is SciTools Understand (CK metrics through `und metrics` and the Python API). Understand (Build 1265, macOS arm64) was installed on 2026-10-17, along with the Understand for VS Code extension (v1.1.6); the `und`, `userver`, and `upython` command-line tools are available. A license was activated on 2026-11-01 (valid until 2027-10-26); a test run of `und metrics` on a sample Python file produced both file-level and function-level metrics (e.g., line counts and cyclomatic complexity per function). Joern 4.0.665 [23] was installed on 2026-10-25 to obtain per-method program dependence graphs (PDGs) from source code; its Python frontend (`pysrc2cpg`) was verified on a sample function, producing data- and control-dependence edges together with parameter, call, and return nodes that are candidate signals for COSMIC Entry, Read, Write, and Exit movements. Whether PDG-derived features will be used in the models has not been decided. [TBD: rest of design]
+**Decision (2026-10-17):** Python is the first target language. This allows direct comparison with the prior code-based study [2] and reuse of its manually labeled CodeSearchNet functions. It also fills the gap that no open-source CK tool covers Python (Section 2.4.1). Java is a likely second language. The planned toolchain is SciTools Understand (CK metrics through `und metrics` and the Python API). Understand (Build 1265, macOS arm64) was installed on 2026-10-17, along with the Understand for VS Code extension (v1.1.6); the `und`, `userver`, and `upython` command-line tools are available. A license was activated on 2026-11-01 (valid until 2027-10-26); a test run of `und metrics` on a sample Python file produced both file-level and function-level metrics (e.g., line counts and cyclomatic complexity per function). Joern 4.0.665 [23] was installed on 2026-10-25 to obtain per-method program dependence graphs (PDGs) from source code; its Python frontend (`pysrc2cpg`) was verified on a sample function, producing data- and control-dependence edges together with parameter, call, and return nodes that are candidate signals for COSMIC Entry, Read, Write, and Exit movements. **Decision (2026-11-01, provisional pending advisor confirmation):** PDG-derived features and Understand metrics will be used as model inputs alongside CodeBERT (strategy 3 in Section 2.4.3), addressing RQ1 to RQ3 (Section 1.3). The planned design is: (i) reproduce the text-only CodeBERT baseline of [2] on its released data; (ii) extract per-function structural features; (iii) compare text-only and structure-augmented models under a random split and a project-held-out split. [TBD: feature set, fusion architecture, split procedure]
 
 ### 3.2 Datasets
 
-[TBD: source, size, labeling procedure, label distribution, train/validation/test splits. Link to data in repo.]
+**Primary dataset (identified 2026-11-01):** the COSMIC-labeled Python functions of [2], released by the authors in the public `CodeSizeBERT` repository under the MIT license [24] as `data/code_cosmic.csv`. It contains 1,787 functions with columns `code`, `docstring`, `entry`, `read`, `write`, `exit`, and `cfp`. A MicroM-labeled companion file (`data/code_microm.csv`) is also included. The repository's `stats/acc.csv` reports exact-match accuracies (Entry 0.6704, Read 0.9138, Write 0.8763, Exit 0.7314, CFP 0.4924) that match the figures in [2], which supports that this is the dataset used there. No author contact is needed to obtain it.
+
+Label distribution (computed from `code_cosmic.csv`): mean Entry 0.98, Read 0.13, Write 0.24, Exit 0.89, CFP 2.24 per function. CFP ranges from 0 to 7, with a median of 2. There are no duplicate `code` entries.
+
+Two properties of the released data affect this project's design:
+
+1. **Indentation is not preserved.** In almost all functions (1,778 of 1,787), every line after the signature has the same indentation, so block structure is lost. Only 343 of 1,787 functions parse as valid Python with `ast.parse`. Because Joern and Understand both need syntactically valid code, the original source must be recovered, for example by matching each function to its CodeSearchNet [7] record, which also gives the original formatting.
+2. **No project identifier is included.** The project-held-out split (RQ2) needs each function's source repository. CodeSearchNet records include the repository name and file path, so the matching in (1) would also supply this.
+
+[TBD: matching procedure and match rate, train/validation/test splits.] An earlier repository by the same author, `codebert-ssm` [25], contains CodeSearchNet-derived files (`codesearchnet_manual.csv`, `codesearchnet_auto.csv`) that appear to belong to the earlier study [21]; it has not been examined in detail.
 
 ### 3.3 Models and Baselines
 
@@ -182,7 +200,7 @@ Planned to match prior work so results can be compared:
 
 ## 6. Threats to Validity
 
-- **Internal validity:** [TBD]
+- **Internal validity:** [TBD] Restoring the original formatting of the released functions (Section 3.2) could introduce mismatches between a label and the code it was assigned to; the match procedure must be checked.
 - **External validity:** [TBD]
 - **Construct validity:** [TBD]
 - **Conclusion validity:** [TBD]
@@ -222,6 +240,8 @@ Planned to match prior work so results can be compared:
 21. S. Tenekeci, H. Ünlü, E. Dikenelli, U. Selçuk, G. Kılınç Soylu, O. Demirörs, "Predicting Software Size and Effort from Code Using Natural Language Processing," IWSM-Mensura 2024, CEUR-WS Vol-3852. https://ceur-ws.org/Vol-3852/paper1.pdf
 22. H. Ünlü, S. Tenekeci, C. Çiftçi, İ. B. Oral, T. Atalay, T. Hacaloğlu, B. Musaoğlu, O. Demirörs, "Predicting Software Functional Size Using Natural Language Processing: An Exploratory Case Study," _50th Euromicro SEAA_, pp. 188–193, IEEE, 2024. DOI: 10.1109/SEAA64295.2024.00036
 23. F. Yamaguchi, N. Golde, D. Arp, K. Rieck, "Modeling and Discovering Vulnerabilities with Code Property Graphs," _IEEE Symposium on Security and Privacy_, 2014. Tool: Joern, https://github.com/joernio/joern
+24. S. Tenekeci, CodeSizeBERT: Automating Software Size Measurement from Code Using Language Models (code and data for [2]), MIT license. https://github.com/smtnkc/CodeSizeBERT (accessed 2026-11-01)
+25. S. Tenekeci, codebert-ssm: CodeBERT for CFP size measurement. https://github.com/smtnkc/codebert-ssm (accessed 2026-11-01)
 
 ---
 
@@ -243,3 +263,4 @@ Planned to match prior work so results can be compared:
 | 2026-10-17 | 0.6     | Recorded the Python 3.12 environment (uv), library versions, and hardware in Section 3.5. |
 | 2026-10-25 | 0.7     | Recorded installation of Joern 4.0.665 (with OpenJDK 21) for PDG extraction in Sections 3.1 and 3.4; added ref 23. |
 | 2026-11-01 | 0.8     | Recorded activation of the SciTools Understand license and a successful test metrics run in Section 3.1. |
+| 2026-11-01 | 0.9     | Selected the provisional research problem and RQ1 to RQ3 (structure-augmented CodeBERT; project-held-out evaluation) in Sections 1.2 to 1.4 and 2.5. Recorded the public CodeSizeBERT dataset of [2] and its formatting and project-ID limitations in Sections 3.1, 3.2, and 6. Added refs 24 and 25. |
