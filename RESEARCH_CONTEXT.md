@@ -161,6 +161,6 @@ Full details and citations are in `PAPER.md` Section 2.4.
 - [x] Group's public repos (checked 2026-11-01): `smtnkc/CodeSizeBERT` (Stage 2 code + data), `smtnkc/SSMBERT` (Stage 3 code, requirements), `smtnkc/SSMB` (Stage 3 dataset), `smtnkc/codebert-ssm` (earlier CodeBERT work, probably IWSM 2024), `smtnkc/AI-Estimator-API`. Trained Stage 3 models: huggingface.co/smtnkc/SSMBERT.
 - [x] Research question chosen and approved by the advisor (2026-11-01, see Section 1).
 - [x] Data repair done (2026-11-01).
-- [ ] **Next:** reproduce the CodeBERT baseline (5-fold CV, 5 epochs/fold, their `cross_pred.py`) on the released text, then on the usable subset.
+- [ ] **Next:** reproduce the CodeBERT baseline (5-fold CV, 5 epochs/fold, their `cross_pred.py`) on the released text, then on the usable subset. Scripts are ready and tested: `scripts/04_baseline_codebert.py`, `scripts/04_run_baseline.sh`, `scripts/05_report_baseline.py`. **Paused 2026-11-01 at the user's request** before any fold finished, so the user can review the plan first. Measured speed: ~143 s/epoch on the M3, so ~4 h per subset and ~8 h for both. Restart with `bash scripts/04_run_baseline.sh`; it resumes at the last finished fold.
 - [ ] Then: extract Joern PDG features + Understand metrics from `code_restored`; build a project-held-out split grouped by `repository`.
 - [~] Advisor guidance: year-plus project, graphs required (2026-11-01). Deadlines and deliverables are still unknown.

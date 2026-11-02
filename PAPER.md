@@ -3,7 +3,7 @@
 **Author:** Sky Zheng, Undergraduate Researcher
 **Advisor:** Dr. Ekincan Ufuktepe
 **Institution:** University of Missouri, Columbia
-**Draft version:** 0.11 · **Last updated:** 2026-11-01
+**Draft version:** 0.12 · **Last updated:** 2026-11-01
 
 > **Status:** Living draft. Sections marked `[TBD]` are not written yet. Every update to the project (papers read, decisions made, experiments run, results) goes into the matching section below and gets an entry in the **Revision History** at the end.
 
@@ -187,11 +187,19 @@ The repair also revealed how the released text was preprocessed, which matters f
 
 ### 3.3 Models and Baselines
 
-[TBD]
+**Text-only CodeBERT baseline (reproduction of [2]).** `scripts/04_baseline_codebert.py` ports the authors' `cross_pred.py` [24] and keeps its protocol: `microsoft/codebert-base` [6] with a single-output regression head and MSE loss, one model per movement type (Entry, Exit, Read, Write), AdamW (learning rate 2×10⁻⁵, no weight decay, no learning-rate schedule), batch size 32, maximum input length 512 tokens, 5 epochs, and seed 42. The input is the released `code` text. Evaluation is 5-fold cross-validation over the authors' shuffled file, split in order into five contiguous folds, with a fresh model trained for each fold. For each fold, the epoch with the lowest MSE on the test fold supplies the predictions. Predictions are rounded to integers before scoring, and total CFP is the sum of the four rounded movement predictions (`scripts/05_report_baseline.py`, following the authors' `sum_preds.py` and `calculate_metrics.py`).
+
+The port differs from the original only in ways that do not change the model's computation: it runs on Apple MPS rather than CUDA; each batch of 32 is accumulated from four micro-batches of 8 to fit in 16 GB of memory; each micro-batch is padded to its longest input (at most 512 tokens) rather than always to 512, with padding masked as before; and seeds are reset per fold (42 + fold index) so an interrupted run can resume. Exact numerical agreement with [2] is not expected, because GPU kernels and random-number streams differ across hardware.
+
+The upstream protocol selects each fold's epoch by its MSE on that same test fold, so test data influence model selection and the reported accuracy is optimistically biased. To measure this bias, the predictions of every epoch are stored, and results are also reported for a rule fixed in advance (always the last epoch, *epoch5*).
+
+The baseline is run on two sets: *released* (all 1,787 functions, the reproduction) and *usable* (the 1,766 functions whose source could be restored, Section 3.2), which will be the evaluation set for the structure-augmented models.
+
+[TBD: structure-augmented models.]
 
 ### 3.4 Training and Experimental Setup
 
-[TBD: hyperparameters, hardware, random seeds.] Software versions: SciTools Understand Build 1265; Joern 4.0.665 on OpenJDK 21.0.13 (Homebrew); Matplotlib 3.11.2 for figures; Understand for VS Code extension v1.1.6. Python 3.12.12 environment managed with uv (dependencies pinned in `pyproject.toml` and `uv.lock`): PyTorch 2.14.1 (Apple Metal/MPS backend), Transformers 5.20.1, Datasets 5.1.0, scikit-learn 1.9.1, pandas 3.0.6, NumPy 2.5.4, Radon 6.0.1, and Lizard 1.24.1. Hardware: Apple M3, 16 GB RAM. [TBD: remaining software versions]
+[TBD: hyperparameters, hardware, random seeds.] Software versions: SciTools Understand Build 1265; Joern 4.0.665 on OpenJDK 21.0.13 (Homebrew); Matplotlib 3.11.2 for figures; the CodeBERT checkpoint is `microsoft/codebert-base` from the Hugging Face Hub; Understand for VS Code extension v1.1.6. Python 3.12.12 environment managed with uv (dependencies pinned in `pyproject.toml` and `uv.lock`): PyTorch 2.14.1 (Apple Metal/MPS backend), Transformers 5.20.1, Datasets 5.1.0, scikit-learn 1.9.1, pandas 3.0.6, NumPy 2.5.4, Radon 6.0.1, and Lizard 1.24.1. Hardware: Apple M3, 16 GB RAM. [TBD: remaining software versions]
 
 ### 3.5 Evaluation Metrics
 
@@ -229,7 +237,7 @@ Planned to match prior work so results can be compared:
 - **Internal validity:** [TBD] Restoring the original formatting of the released functions (Section 3.2) could introduce mismatches between a label and the code it was assigned to. 94% of COSMIC matches are exact; the 113 fuzzy matches were accepted at similarity ≥ 0.80 and the weakest were inspected by hand, but not every fuzzy match was checked individually. Excluding Python 2 functions (Section 3.2) slightly changes the dataset relative to [2], so baseline figures are compared on both the full released set and the usable subset.
 - **External validity:** [TBD] The project-held-out split uses open-source repositories as a stand-in for organizations. Variation between open-source projects may be smaller or different in kind than variation between companies, so results for unseen projects may not transfer to unseen organizations (G1).
 - **Construct validity:** [TBD]
-- **Conclusion validity:** [TBD]
+- **Conclusion validity:** [TBD] The baseline protocol of [2] selects each fold's epoch using the test fold (Section 3.3), which biases reported accuracy upward; results under a fixed epoch are reported alongside it.
 
 ---
 
@@ -292,3 +300,4 @@ Planned to match prior work so results can be compared:
 | 2026-11-01 | 0.9     | Selected the provisional research problem and RQ1 to RQ3 (structure-augmented CodeBERT; project-held-out evaluation) in Sections 1.2 to 1.4 and 2.5. Recorded the public CodeSizeBERT dataset of [2] and its formatting and project-ID limitations in Sections 3.1, 3.2, and 6. Added refs 24 and 25. |
 | 2026-11-01 | 0.10    | Specified the baseline protocol and the same-code-text control for the model comparison (Section 3.1); added the projects-as-proxy-for-organizations limitation (Section 6). |
 | 2026-11-01 | 0.11    | Recorded the data repair (matching to CodeSearchNet): procedure, match and usable counts, four figures in `figures/data_repair/`, and preprocessing artifacts found in the released data (Section 3.2); updated Sections 3.4 and 6. |
+| 2026-11-01 | 0.12    | Described the text-only CodeBERT baseline reproduction (protocol, deviations, the test-fold epoch-selection issue) in Section 3.3; added notes to Sections 3.4 and 6. |

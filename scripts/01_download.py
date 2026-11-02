@@ -3,6 +3,7 @@
 Downloads, at pinned versions so the result is reproducible:
   - the COSMIC- and MicroM-labeled Python functions released with the Stage 2 paper
     (github.com/smtnkc/CodeSizeBERT)
+  - the upstream training/scoring scripts and published scores from the same repository
   - the Python part of CodeSearchNet (huggingface.co/datasets/code-search-net/code_search_net),
     the corpus those functions were originally taken from
 
@@ -22,7 +23,18 @@ CSN_SHA = "bd0cf261e357a3eb5c8fba490d23ec1a1cd59555"  # main on 2026-02-23
 
 DOWNLOADS = {
     RAW / "codesizebert" / name: f"https://raw.githubusercontent.com/smtnkc/CodeSizeBERT/{CODESIZEBERT_SHA}/data/{name}"
-    for name in ["code_cosmic.csv", "code_microm.csv"]
+    for name in ["code_cosmic.csv", "code_microm.csv", "code_cosmic-shuffled-data.csv"]
+} | {
+    # Upstream training/scoring scripts and published scores, for the baseline reproduction (step 4).
+    RAW / "codesizebert" / "upstream" / name: f"https://raw.githubusercontent.com/smtnkc/CodeSizeBERT/{CODESIZEBERT_SHA}/{name}"
+    for name in [
+        "cross_pred.py",
+        "shuffle_data.py",
+        "sum_preds.py",
+        "calculate_metrics.py",
+        "run_cross_pred.sh",
+        "stats/COSMIC.csv",
+    ]
 } | {
     RAW / "codesearchnet" / "python" / name: (
         f"https://huggingface.co/datasets/code-search-net/code_search_net/resolve/{CSN_SHA}/python/{name}"
