@@ -3,7 +3,7 @@
 **Author:** Sky Zheng, Undergraduate Researcher
 **Advisor:** Dr. Ekincan Ufuktepe
 **Institution:** University of Missouri, Columbia
-**Draft version:** 0.9 · **Last updated:** 2026-11-01
+**Draft version:** 0.11 · **Last updated:** 2026-11-01
 
 > **Status:** Living draft. Sections marked `[TBD]` are not written yet. Every update to the project (papers read, decisions made, experiments run, results) goes into the matching section below and gets an entry in the **Revision History** at the end.
 
@@ -144,7 +144,7 @@ Existing work leaves open several questions. This paper targets two of them (202
 
 ### 3.1 Research Design
 
-**Decision (2026-10-17):** Python is the first target language. This allows direct comparison with the prior code-based study [2] and reuse of its manually labeled CodeSearchNet functions. It also fills the gap that no open-source CK tool covers Python (Section 2.4.1). Java is a likely second language. The planned toolchain is SciTools Understand (CK metrics through `und metrics` and the Python API). Understand (Build 1265, macOS arm64) was installed on 2026-10-17, along with the Understand for VS Code extension (v1.1.6); the `und`, `userver`, and `upython` command-line tools are available. A license was activated on 2026-11-01 (valid until 2027-10-26); a test run of `und metrics` on a sample Python file produced both file-level and function-level metrics (e.g., line counts and cyclomatic complexity per function). Joern 4.0.665 [23] was installed on 2026-10-25 to obtain per-method program dependence graphs (PDGs) from source code; its Python frontend (`pysrc2cpg`) was verified on a sample function, producing data- and control-dependence edges together with parameter, call, and return nodes that are candidate signals for COSMIC Entry, Read, Write, and Exit movements. **Decision (2026-11-01, provisional pending advisor confirmation):** PDG-derived features and Understand metrics will be used as model inputs alongside CodeBERT (strategy 3 in Section 2.4.3), addressing RQ1 to RQ3 (Section 1.3). The planned design is: (i) reproduce the text-only CodeBERT baseline of [2] on its released data; (ii) extract per-function structural features; (iii) compare text-only and structure-augmented models under a random split and a project-held-out split. [TBD: feature set, fusion architecture, split procedure]
+**Decision (2026-10-17):** Python is the first target language. This allows direct comparison with the prior code-based study [2] and reuse of its manually labeled CodeSearchNet functions. It also fills the gap that no open-source CK tool covers Python (Section 2.4.1). Java is a likely second language. The planned toolchain is SciTools Understand (CK metrics through `und metrics` and the Python API). Understand (Build 1265, macOS arm64) was installed on 2026-10-17, along with the Understand for VS Code extension (v1.1.6); the `und`, `userver`, and `upython` command-line tools are available. A license was activated on 2026-11-01 (valid until 2027-10-26); a test run of `und metrics` on a sample Python file produced both file-level and function-level metrics (e.g., line counts and cyclomatic complexity per function). Joern 4.0.665 [23] was installed on 2026-10-25 to obtain per-method program dependence graphs (PDGs) from source code; its Python frontend (`pysrc2cpg`) was verified on a sample function, producing data- and control-dependence edges together with parameter, call, and return nodes that are candidate signals for COSMIC Entry, Read, Write, and Exit movements. **Decision (2026-11-01, provisional pending advisor confirmation):** PDG-derived features and Understand metrics will be used as model inputs alongside CodeBERT (strategy 3 in Section 2.4.3), addressing RQ1 to RQ3 (Section 1.3). The planned design is: (i) reproduce the text-only CodeBERT baseline of [2] on its released data; (ii) extract per-function structural features; (iii) compare text-only and structure-augmented models under a random split and a project-held-out split. The baseline follows the protocol of [2] (5-fold cross-validation, 5 epochs per fold, as implemented in [24]). To isolate the effect of the structural features, both the text-only and the structure-augmented models receive the same version of the code text; the restored source (Section 3.2) is used for feature extraction. [TBD: feature set, fusion architecture, split procedure]
 
 ### 3.2 Datasets
 
@@ -157,7 +157,33 @@ Two properties of the released data affect this project's design:
 1. **Indentation is not preserved.** In almost all functions (1,778 of 1,787), every line after the signature has the same indentation, so block structure is lost. Only 343 of 1,787 functions parse as valid Python with `ast.parse`. Because Joern and Understand both need syntactically valid code, the original source must be recovered, for example by matching each function to its CodeSearchNet [7] record, which also gives the original formatting.
 2. **No project identifier is included.** The project-held-out split (RQ2) needs each function's source repository. CodeSearchNet records include the repository name and file path, so the matching in (1) would also supply this.
 
-[TBD: matching procedure and match rate, train/validation/test splits.] An earlier repository by the same author, `codebert-ssm` [25], contains CodeSearchNet-derived files (`codesearchnet_manual.csv`, `codesearchnet_auto.csv`) that appear to belong to the earlier study [21]; it has not been examined in detail.
+**Data repair (2026-11-01).** Each labeled function was matched back to its CodeSearchNet [7] record (Hugging Face `code-search-net/code_search_net`, revision `bd0cf26`, 457,461 Python functions across the train, validation, and test partitions). The pipeline is in `scripts/01_download.py` (pinned downloads), `scripts/02_match_codesearchnet.py` (matching), and `scripts/03_report_repair.py` (summary table and figures in `figures/data_repair/`). Matching uses the code with all whitespace removed as a key. On the CodeSearchNet side the key is built from the code tokens (which exclude the docstring) with comment tokens dropped, because the released code has no comments. If no key matches exactly, the most similar CodeSearchNet function with the same signature (or, failing that, the same bare name) is taken, with similarity computed after removing triple-quoted strings from both sides. A function is kept (*usable*) when the match is exact, or fuzzy with similarity ≥ 0.80, and the restored source parses as Python 3.
+
+| | COSMIC | MicroM |
+|---|---|---|
+| Labeled functions | 1,787 | 2,126 |
+| Exact match | 1,674 | 1,959 |
+| Fuzzy match | 113 | 167 |
+| No match | 0 | 0 |
+| Parses as Python 3, as released | 343 (19%) | 2,069 (97%) |
+| Parses as Python 3, restored | 1,767 (99%) | 2,108 (99%) |
+| **Usable** | **1,766 (98.8%)** | **2,108 (99.2%)** |
+| Distinct repositories (usable) | 950 | 1,373 |
+| Largest number of functions from one repository | 66 | 48 |
+
+Source: `figures/data_repair/summary.csv`. Figures: `figures/data_repair/fig1_match_outcome.png` (match outcome), `fig2_valid_python.png` (valid Python before and after), `fig3_cosmic_labels.png` (COSMIC label distribution in the usable set), and `fig4_functions_per_repo.png` (functions per repository).
+
+Of the 21 excluded COSMIC functions, 20 are matched but do not parse as Python 3; in 19 of them the restored source shows Python 2 syntax (e.g., `print` statements, `except X, e`). The remaining one (`run_instances`, similarity 0.04) was checked by hand: the match is correct, but the labeled copy kept most of a 27,000-character docstring and the function body is only `pass`. All fuzzy matches with similarity below 0.90 were inspected; their differences were single-quoted docstrings or garbled non-ASCII text, not differing code.
+
+The repair also revealed how the released text was preprocessed, which matters for interpreting the baseline of [2]:
+
+- **All triple-quoted strings were removed, not only docstrings.** Multi-line string literals in the function body, including embedded SQL queries, are missing (e.g., `query = """SELECT ..."""` became `query =`). Such strings can carry evidence for Read and Write movements that the text-only model never saw.
+- **Comment removal truncated some strings.** Text after a `#` was dropped even inside string literals (e.g., a character set ending `...!@#$%^&*` became `...!@`).
+- **Only the COSMIC file had its indentation flattened;** the MicroM file keeps it (97% parse as released).
+- The released MicroM file has 2,126 functions, one fewer than the 2,127 reported in [2].
+- Most repositories contribute one labeled function (638 of 950 for COSMIC; Figure `fig4`), so a project-held-out split is feasible, although a few repositories (up to 66 functions) must be kept within a single fold.
+
+[TBD: train/validation/test splits.] An earlier repository by the same author, `codebert-ssm` [25], contains CodeSearchNet-derived files (`codesearchnet_manual.csv`, `codesearchnet_auto.csv`) that appear to belong to the earlier study [21]; it has not been examined in detail.
 
 ### 3.3 Models and Baselines
 
@@ -165,7 +191,7 @@ Two properties of the released data affect this project's design:
 
 ### 3.4 Training and Experimental Setup
 
-[TBD: hyperparameters, hardware, random seeds.] Software versions: SciTools Understand Build 1265; Joern 4.0.665 on OpenJDK 21.0.13 (Homebrew); Understand for VS Code extension v1.1.6. Python 3.12.12 environment managed with uv (dependencies pinned in `pyproject.toml` and `uv.lock`): PyTorch 2.14.1 (Apple Metal/MPS backend), Transformers 5.20.1, Datasets 5.1.0, scikit-learn 1.9.1, pandas 3.0.6, NumPy 2.5.4, Radon 6.0.1, and Lizard 1.24.1. Hardware: Apple M3, 16 GB RAM. [TBD: remaining software versions]
+[TBD: hyperparameters, hardware, random seeds.] Software versions: SciTools Understand Build 1265; Joern 4.0.665 on OpenJDK 21.0.13 (Homebrew); Matplotlib 3.11.2 for figures; Understand for VS Code extension v1.1.6. Python 3.12.12 environment managed with uv (dependencies pinned in `pyproject.toml` and `uv.lock`): PyTorch 2.14.1 (Apple Metal/MPS backend), Transformers 5.20.1, Datasets 5.1.0, scikit-learn 1.9.1, pandas 3.0.6, NumPy 2.5.4, Radon 6.0.1, and Lizard 1.24.1. Hardware: Apple M3, 16 GB RAM. [TBD: remaining software versions]
 
 ### 3.5 Evaluation Metrics
 
@@ -200,8 +226,8 @@ Planned to match prior work so results can be compared:
 
 ## 6. Threats to Validity
 
-- **Internal validity:** [TBD] Restoring the original formatting of the released functions (Section 3.2) could introduce mismatches between a label and the code it was assigned to; the match procedure must be checked.
-- **External validity:** [TBD]
+- **Internal validity:** [TBD] Restoring the original formatting of the released functions (Section 3.2) could introduce mismatches between a label and the code it was assigned to. 94% of COSMIC matches are exact; the 113 fuzzy matches were accepted at similarity ≥ 0.80 and the weakest were inspected by hand, but not every fuzzy match was checked individually. Excluding Python 2 functions (Section 3.2) slightly changes the dataset relative to [2], so baseline figures are compared on both the full released set and the usable subset.
+- **External validity:** [TBD] The project-held-out split uses open-source repositories as a stand-in for organizations. Variation between open-source projects may be smaller or different in kind than variation between companies, so results for unseen projects may not transfer to unseen organizations (G1).
 - **Construct validity:** [TBD]
 - **Conclusion validity:** [TBD]
 
@@ -264,3 +290,5 @@ Planned to match prior work so results can be compared:
 | 2026-10-25 | 0.7     | Recorded installation of Joern 4.0.665 (with OpenJDK 21) for PDG extraction in Sections 3.1 and 3.4; added ref 23. |
 | 2026-11-01 | 0.8     | Recorded activation of the SciTools Understand license and a successful test metrics run in Section 3.1. |
 | 2026-11-01 | 0.9     | Selected the provisional research problem and RQ1 to RQ3 (structure-augmented CodeBERT; project-held-out evaluation) in Sections 1.2 to 1.4 and 2.5. Recorded the public CodeSizeBERT dataset of [2] and its formatting and project-ID limitations in Sections 3.1, 3.2, and 6. Added refs 24 and 25. |
+| 2026-11-01 | 0.10    | Specified the baseline protocol and the same-code-text control for the model comparison (Section 3.1); added the projects-as-proxy-for-organizations limitation (Section 6). |
+| 2026-11-01 | 0.11    | Recorded the data repair (matching to CodeSearchNet): procedure, match and usable counts, four figures in `figures/data_repair/`, and preprocessing artifacts found in the released data (Section 3.2); updated Sections 3.4 and 6. |
