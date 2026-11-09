@@ -183,6 +183,8 @@ The repair also revealed how the released text was preprocessed, which matters f
 - The released MicroM file has 2,126 functions, one fewer than the 2,127 reported in [2].
 - Most repositories contribute one labeled function (638 of 950 for COSMIC; Figure `fig4`), so a project-held-out split is feasible, although a few repositories (up to 66 functions) must be kept within a single fold.
 
+**Possible Read/Write label inversion (found 2026-11-08, unresolved).** The structural features (Section 4.0) suggest that the released `read` and `write` columns may be interchanged relative to the COSMIC definitions, under which retrieving data from persistent storage is a Read and storing it is a Write [4]. Of the 33 usable COSMIC functions whose only SQL verb in string literals is SELECT, 3 (9.1%) are labeled Read ≥ 1 and 25 (75.8%) Write ≥ 1 (`figures/features/sql_vs_read_write.csv`, `fig3_sql_vs_read_write.png`). Examples include a function that returns the list of languages in a database and a function whose body is a single `SELECT id ...` existence check, both labeled Read 0 and Write 1. Write is also the more frequent label (mean 0.24 vs. 0.14 per function), which is unexpected for functions selected by data-access keywords. The evidence is one-sided: functions whose only SQL verbs are INSERT, UPDATE, or DELETE (n = 35) are labeled Read ≥ 1 in 40.0% and Write ≥ 1 in 34.3% of cases, which is mixed rather than reversed; this group is noisier because UPDATE and DELETE also match ordinary words in log and error messages. The labels are identical in the raw download and the repaired data, and the upstream scripts [24] use the columns by name, so the issue, if real, is in the released data rather than in this project's processing. It does not affect total CFP, but it changes the interpretation of per-movement results in [2] (e.g., the reported Read accuracy). [TBD: confirm with the advisor or the authors of [2]; until then, the columns are used as released.]
+
 [TBD: train/validation/test splits.] An earlier repository by the same author, `codebert-ssm` [25], contains CodeSearchNet-derived files (`codesearchnet_manual.csv`, `codesearchnet_auto.csv`) that appear to belong to the earlier study [21]; it has not been examined in detail.
 
 ### 3.3 Models and Baselines
@@ -195,7 +197,14 @@ The upstream protocol selects each fold's epoch by its MSE on that same test fol
 
 The baseline is run on two sets: *released* (all 1,787 functions, the reproduction) and *usable* (the 1,766 functions whose source could be restored, Section 3.2), which will be the evaluation set for the structure-augmented models.
 
-[TBD: structure-augmented models.]
+**Structural features (extracted 2026-11-08).** Every usable function's restored source is written to its own file (`data/derived/functions/<dataset>/<id>.py`), so that each tool's output can be joined to the labels by file name. Two feature sets are extracted for all 1,766 COSMIC and all 2,108 MicroM usable functions (coverage 100%; `figures/features/summary.csv`):
+
+- **Understand metrics** (`scripts/06_extract_understand.py`, 18 features, prefix `und_`): the function-level metrics reported by `und metrics` with all metrics enabled, namely line counts (total, code, declarative, executable, comment, blank), statement counts (total, declarative, executable), cyclomatic complexity in four variants, essential complexity, path count and its logarithm, maximum nesting depth, and comment-to-code ratio. Coding-standard violation counts are dropped. Understand defaults to Python 2 parsing because its interpreter setting (`PythonExe = python`) does not resolve on macOS; under Python 2, valid Python 3 code (e.g., `print(..., file=f)`, `async`) produced parse errors in about a dozen functions. The script therefore sets `PythonSetVersion = Python3` and points `PythonExe` at a system `python3`, after which none of the analyzed functions produce errors. **CK metrics are not obtainable for this dataset:** they are class-level (Section 2.4.1), and each sample is a single function with its enclosing class removed. This is the unit mismatch noted in Section 2.4.3.
+- **Joern PDG features** (`scripts/07_extract_joern.py` with `tools/joern/function_facts.sc`, 19 features, prefix `jn_`): a code property graph is built over each dataset, and for every top-level function (Joern full name `<id>.py:<module>.<name>`) the script stores its PDG as `data/derived/joern/<dataset>/pdg/<id>.dot`, kept for possible graph-based models, together with its parameters, return statements, nested definitions, and calls. From these, the following are computed: PDG shape (nodes, data-dependence edges, control-dependence edges, distinct variables on data-dependence edges, data-dependence edges leaving parameters); interface (parameters excluding `self`/`cls`, returns, yields, nested definitions); calls (non-operator calls and distinct callees); and *heuristic call categories*, the number of calls whose callee name contains a read-, write-, exit-, or entry-like word (word lists are in the script), plus occurrences of the SQL verbs SELECT, INSERT, UPDATE, and DELETE in non-docstring string literals. The call categories are keyword heuristics intended to approximate candidate data movements; they are not an implementation of the COSMIC measurement rules. Joern's Python frontend does not represent `yield` as a call, so yields are counted from the Python AST.
+
+Outputs are `data/derived/features/{understand,joern}_{cosmic,microm}.csv` (one row per function `id`). Extraction takes about 15 s (Understand) and 30 s (Joern) for both datasets on the hardware in Section 3.4.
+
+[TBD: structure-augmented models (fusion of features with CodeBERT).]
 
 ### 3.4 Training and Experimental Setup
 
@@ -215,6 +224,13 @@ Planned to match prior work so results can be compared:
 ## 4. Results
 
 [TBD: one subsection per RQ. Report tables/figures with exact numbers and link to the scripts or notebooks that produced them.]
+
+### 4.0 Preliminary Analysis of the Structural Features
+
+Spearman correlations between each structural feature (Section 3.3) and each label were computed on the usable sets (`scripts/08_report_features.py`; tables in `figures/features/correlations_{cosmic,microm}.csv`; heatmaps in `figures/features/fig1_correlation_cosmic.png` and `fig2_correlation_microm.png`). This is a descriptive check of single features, not a test of RQ1, since a model may combine weakly correlated features.
+
+- **Generic size and complexity metrics are almost unrelated to COSMIC size.** Across the 18 Understand metrics and the five COSMIC labels, ρ lies between −0.14 and +0.12; for total CFP it lies between −0.11 and +0.04. The functions are short (median 12 lines of code, maximum 44), and COSMIC counts data movements, not code volume.
+- **Call-based Joern features carry the strongest signals,** but with an unexpected pairing: read-like calls correlate with the Write label (ρ = 0.27) and write-like calls with the Read label (ρ = 0.31); SELECT literals correlate with Write (ρ = 0.20) and INSERT literals with Read (ρ = 0.21). The largest correlation with total CFP is 0.12 (read-like calls). The pairing is examined in Section 3.2 (label direction).
 
 ### 4.1 RQ1
 
@@ -236,7 +252,7 @@ Planned to match prior work so results can be compared:
 
 - **Internal validity:** [TBD] Restoring the original formatting of the released functions (Section 3.2) could introduce mismatches between a label and the code it was assigned to. 94% of COSMIC matches are exact; the 113 fuzzy matches were accepted at similarity ≥ 0.80 and the weakest were inspected by hand, but not every fuzzy match was checked individually. Excluding Python 2 functions (Section 3.2) slightly changes the dataset relative to [2], so baseline figures are compared on both the full released set and the usable subset.
 - **External validity:** [TBD] The project-held-out split uses open-source repositories as a stand-in for organizations. Variation between open-source projects may be smaller or different in kind than variation between companies, so results for unseen projects may not transfer to unseen organizations (G1).
-- **Construct validity:** [TBD]
+- **Construct validity:** [TBD] The released Read and Write labels may be interchanged relative to the COSMIC definitions (Section 3.2); per-movement results for Read and Write should be interpreted with this in mind until it is resolved. The heuristic call categories (Section 3.3) depend on hand-chosen word lists and on callee names, which can be uninformative (e.g., `execute`) or misleading. Understand's metrics measure code volume and control flow, not data movement, so they are at most indirect measures of functional size.
 - **Conclusion validity:** [TBD] The baseline protocol of [2] selects each fold's epoch using the test fold (Section 3.3), which biases reported accuracy upward; results under a fixed epoch are reported alongside it.
 
 ---
@@ -301,3 +317,4 @@ Planned to match prior work so results can be compared:
 | 2026-11-01 | 0.10    | Specified the baseline protocol and the same-code-text control for the model comparison (Section 3.1); added the projects-as-proxy-for-organizations limitation (Section 6). |
 | 2026-11-01 | 0.11    | Recorded the data repair (matching to CodeSearchNet): procedure, match and usable counts, four figures in `figures/data_repair/`, and preprocessing artifacts found in the released data (Section 3.2); updated Sections 3.4 and 6. |
 | 2026-11-01 | 0.12    | Described the text-only CodeBERT baseline reproduction (protocol, deviations, the test-fold epoch-selection issue) in Section 3.3; added notes to Sections 3.4 and 6. |
+| 2026-11-08 | 0.13    | Extracted Understand (18) and Joern PDG (19) per-function features for all usable functions (Section 3.3); added a preliminary feature–label correlation analysis (Section 4.0, figures in `figures/features/`); recorded a possible Read/Write label inversion in the released data (Sections 3.2 and 6). |
