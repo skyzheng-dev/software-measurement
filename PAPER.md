@@ -232,6 +232,8 @@ Spearman correlations between each structural feature (Section 3.3) and each lab
 - **Generic size and complexity metrics are almost unrelated to COSMIC size.** Across the 18 Understand metrics and the five COSMIC labels, ρ lies between −0.14 and +0.12; for total CFP it lies between −0.11 and +0.04. The functions are short (median 12 lines of code, maximum 44), and COSMIC counts data movements, not code volume.
 - **Call-based Joern features carry the strongest signals,** but with an unexpected pairing: read-like calls correlate with the Write label (ρ = 0.27) and write-like calls with the Read label (ρ = 0.31); SELECT literals correlate with Write (ρ = 0.20) and INSERT literals with Read (ρ = 0.21). The largest correlation with total CFP is 0.12 (read-like calls). The pairing is examined in Section 3.2 (label direction).
 
+Plain-language versions of these results for non-specialist readers (coverage, single-feature correlations with COSMIC labels, the SQL label-direction check, and the read/write crossover) are produced by `scripts/09_advisor_figures.py` from the step-8 summary CSVs and saved in `figures/advisor/fig1_coverage.png` to `fig4_crossover.png`. They contain no numbers beyond those reported above.
+
 ### 4.1 RQ1
 
 [TBD]
@@ -318,3 +320,4 @@ Spearman correlations between each structural feature (Section 3.3) and each lab
 | 2026-11-01 | 0.11    | Recorded the data repair (matching to CodeSearchNet): procedure, match and usable counts, four figures in `figures/data_repair/`, and preprocessing artifacts found in the released data (Section 3.2); updated Sections 3.4 and 6. |
 | 2026-11-01 | 0.12    | Described the text-only CodeBERT baseline reproduction (protocol, deviations, the test-fold epoch-selection issue) in Section 3.3; added notes to Sections 3.4 and 6. |
 | 2026-11-08 | 0.13    | Extracted Understand (18) and Joern PDG (19) per-function features for all usable functions (Section 3.3); added a preliminary feature–label correlation analysis (Section 4.0, figures in `figures/features/`); recorded a possible Read/Write label inversion in the released data (Sections 3.2 and 6). |
+| 2026-11-15 | 0.14    | Added four plain-language summary figures for advisor meetings (`scripts/09_advisor_figures.py`, `figures/advisor/`); linked them from Section 4.0. |

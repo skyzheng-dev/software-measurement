@@ -1,7 +1,7 @@
 # Research Context: Automated Software Size Measurement
 
 > **Purpose of this file:** Give any future session (human or AI) the background needed to continue this project without re-explaining it.
-> **Last updated:** 2026-11-08
+> **Last updated:** 2026-11-15
 
 ---
 
@@ -164,5 +164,6 @@ Full details and citations are in `PAPER.md` Section 2.4.
 - [ ] **Next:** reproduce the CodeBERT baseline (5-fold CV, 5 epochs/fold, their `cross_pred.py`) on the released text, then on the usable subset. Scripts are ready and tested: `scripts/04_baseline_codebert.py`, `scripts/04_run_baseline.sh`, `scripts/05_report_baseline.py`. **Paused 2026-11-01 at the user's request** before any fold finished, so the user can review the plan first. Measured speed: ~143 s/epoch on the M3, so ~4 h per subset and ~8 h for both. Restart with `bash scripts/04_run_baseline.sh`; it resumes at the last finished fold.
 - [x] **Structural features extracted (2026-11-08)** for all usable functions (COSMIC 1,766, MicroM 2,108; 100% coverage): `scripts/06_extract_understand.py` (18 Understand function-level metrics, `und_*`), `scripts/07_extract_joern.py` + `tools/joern/function_facts.sc` (19 PDG/call features, `jn_*`; raw PDGs kept in `data/derived/joern/<ds>/pdg/<id>.dot`), `scripts/08_report_features.py` (figures in `figures/features/`). Output: `data/derived/features/{understand,joern}_{cosmic,microm}.csv`. Gotchas: Understand defaults to **Python 2** (its `PythonExe=python` doesn't exist on macOS), so the script forces Python 3 + system `python3`; don't use the venv python there (Understand then crawls torch in site-packages). **CK metrics don't apply** (functions have no class). PDGs are parsed with regex, so `networkx`/`pydot` are not needed.
 - **Findings (2026-11-08, `PAPER.md` §4.0, §3.2):** Understand size/complexity metrics are ~uncorrelated with COSMIC labels (|ρ| ≤ 0.14). Call-based Joern features are the strongest signals. **Possible Read/Write label swap in the released data:** 25 of 33 SELECT-only functions are labeled Write, 3 Read; the reverse check (INSERT/UPDATE/DELETE-only, n=35) is mixed (40% Read, 34% Write). Not resolved: **ask the advisor / authors.** Doesn't affect total CFP.
+- [x] **Advisor figures (2026-11-15):** `scripts/09_advisor_figures.py` makes four plain-language PNGs in `figures/advisor/` (coverage, what tracks COSMIC size, SELECT-vs-Read/Write check, read/write crossover) for meetings.
 - [ ] Then: build a project-held-out split grouped by `repository`; a non-neural feature-only baseline; add CUDA support to `scripts/04_baseline_codebert.py` (it only checks MPS) before running on the advisor's environment (training waits for that environment's approval, decided 2026-11-08).
 - [~] Advisor guidance: year-plus project, graphs required (2026-11-01). Deadlines and deliverables are still unknown.
