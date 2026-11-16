@@ -234,6 +234,16 @@ Spearman correlations between each structural feature (Section 3.3) and each lab
 
 Plain-language versions of these results for non-specialist readers (coverage, single-feature correlations with COSMIC labels, the SQL label-direction check, and the read/write crossover) are produced by `scripts/09_advisor_figures.py` from the step-8 summary CSVs and saved in `figures/advisor/fig1_coverage.png` to `fig4_crossover.png`. They contain no numbers beyond those reported above.
 
+### 4.0b Pilot: Understand on a Complete Small Project (Flaskr)
+
+At the advisor's request (2026-11-15), Understand was applied to a small, complete open-source project while the training environment is being prepared. The project is Flaskr, the official tutorial application of Flask (pallets/flask, commit `49943b5`, BSD-3-Clause): a blog with registration, login, and a two-table SQLite database. Only the application package (`examples/tutorial/flaskr`, 4 source files) was analyzed; tests were excluded. The pipeline is `scripts/10_understand_flaskr.py`; outputs are in `figures/flaskr/` (`entities.csv`, `functions.csv`, `fig1_cosmic_vs_understand.png`).
+
+A COSMIC count for each of the nine user-triggered functional processes (seven HTTP routes, one CLI command, and a test route) was drafted under stated conventions (one process per route or command; error and confirmation messages as one Exit per process; the session cookie not treated as persistent storage; the per-request login check not attributed to individual processes). The draft is in `labels/flaskr_cosmic_draft.csv`, with a note per process. **It has not yet been verified by the researcher**, and two decisions are open: whether Log out is a functional process (it has 1 CFP, below the COSMIC minimum of 2), and whether a JOIN over post and user counts as one Read or two. [TBD: verify the draft and replace it with a checked count.]
+
+- **Understand found 18 functions, but only 9 are COSMIC functional processes.** The other 9 are helpers (`get_db`, `get_post`, `load_logged_in_user`, a decorator and its wrapper, and others). Under COSMIC, data movements in a helper count towards the process that calls it. For example, Delete post is 6 lines of code but has 5 CFP in the draft, because its Reads happen inside `get_post`. A per-function sample, as in the dataset of [2], cannot see these movements.
+- **No classes were found** (entity kinds: 18 functions, 4 files, 2 packages), so CK metrics do not apply to this project either. A project with classes is needed to test CK metrics.
+- **Code volume does not track COSMIC size here.** Across the nine processes, the Spearman correlation of the draft CFP with lines of code is 0.22, and with cyclomatic complexity −0.01. With nine data points this is illustrative only, but it agrees with the dataset-level finding in Section 4.0.
+
 ### 4.1 RQ1
 
 [TBD]
@@ -321,3 +331,4 @@ Plain-language versions of these results for non-specialist readers (coverage, s
 | 2026-11-01 | 0.12    | Described the text-only CodeBERT baseline reproduction (protocol, deviations, the test-fold epoch-selection issue) in Section 3.3; added notes to Sections 3.4 and 6. |
 | 2026-11-08 | 0.13    | Extracted Understand (18) and Joern PDG (19) per-function features for all usable functions (Section 3.3); added a preliminary feature–label correlation analysis (Section 4.0, figures in `figures/features/`); recorded a possible Read/Write label inversion in the released data (Sections 3.2 and 6). |
 | 2026-11-15 | 0.14    | Added four plain-language summary figures for advisor meetings (`scripts/09_advisor_figures.py`, `figures/advisor/`); linked them from Section 4.0. |
+| 2026-11-15 | 0.15    | Added a pilot run of Understand on a complete small project (Flaskr), with a draft hand COSMIC count and one figure (Section 4.0b; `scripts/10_understand_flaskr.py`, `labels/flaskr_cosmic_draft.csv`, `figures/flaskr/`). |

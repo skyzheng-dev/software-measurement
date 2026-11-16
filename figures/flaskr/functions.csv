@@ -1,0 +1,19 @@
+Name,function,CountLineCode,CountStmtExe,Cyclomatic,MaxNesting,process,file,trigger,entry,read,write,exit,cfp,status,notes,is_cosmic_process
+flaskr.auth.login,login,19,15,5.0,2,Log in,flaskr/auth.py,POST /auth/login,1.0,1.0,0.0,1.0,3.0,draft,E: credentials; R: user; X: error message. Session cookie is not persistent storage so no Write.,True
+flaskr.auth.logout,logout,3,2,1.0,0,Log out,flaskr/auth.py,GET /auth/logout,1.0,0.0,0.0,0.0,1.0,draft,Only clears the session cookie. Below the COSMIC minimum of 2 CFP; may not be a functional process at all. NEEDS DECISION.,True
+flaskr.auth.register,register,23,18,6.0,3,Register,flaskr/auth.py,POST /auth/register,1.0,0.0,1.0,1.0,3.0,draft,E: username+password; W: user; X: error message. Duplicate check is done by the DB constraint so no separate Read.,True
+flaskr.blog.create,create,18,13,4.0,2,Create post,flaskr/blog.py,POST /create,1.0,0.0,1.0,1.0,3.0,draft,E: title+body; W: post; X: error message.,True
+flaskr.blog.delete,delete,6,5,1.0,0,Delete post,flaskr/blog.py,POST /<id>/delete,1.0,2.0,1.0,1.0,5.0,draft,E: id; R: post + user (author check via get_post); W: post; X: 403/404 error message.,True
+flaskr.blog.index,index,8,3,1.0,0,View posts,flaskr/blog.py,GET /,1.0,2.0,0.0,1.0,4.0,draft,E: request; R: post + user (JOIN reads two objects of interest); X: post list. Counting the JOIN as 1 Read gives 3.,True
+flaskr.blog.update,update,18,14,4.0,2,Edit post,flaskr/blog.py,GET/POST /<id>/update,1.0,2.0,1.0,2.0,6.0,draft,E: id+title+body; R: post + user (via get_post); W: post; X: current post shown in form + error message. GET and POST could be split into two processes.,True
+flaskr.create_app.hello,hello,2,1,1.0,0,Hello,flaskr/__init__.py,GET /hello,1.0,0.0,0.0,1.0,2.0,draft,E: request; X: fixed greeting.,True
+flaskr.db.init_db_command,init_db_command,3,2,1.0,0,Initialize database,flaskr/db.py,CLI flask init-db,1.0,0.0,2.0,1.0,4.0,draft,E: command; W: user table + post table (recreated); X: confirmation message.,True
+flaskr.auth.load_logged_in_user,load_logged_in_user,8,4,2.0,1,,,,,,,,,,,False
+flaskr.auth.login_required,login_required,7,4,1.0,0,,,,,,,,,,,False
+flaskr.auth.login_required.wrapped_view,wrapped_view,4,3,2.0,1,,,,,,,,,,,False
+flaskr.blog.get_post,get_post,16,6,3.0,1,,,,,,,,,,,False
+flaskr.create_app,create_app,22,12,2.0,1,,,,,,,,,,,False
+flaskr.db.close_db,close_db,4,3,2.0,1,,,,,,,,,,,False
+flaskr.db.get_db,get_db,7,4,2.0,1,,,,,,,,,,,False
+flaskr.db.init_app,init_app,3,2,1.0,0,,,,,,,,,,,False
+flaskr.db.init_db,init_db,4,3,1.0,1,,,,,,,,,,,False

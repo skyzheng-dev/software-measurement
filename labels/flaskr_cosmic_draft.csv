@@ -1,0 +1,10 @@
+process,function,file,trigger,entry,read,write,exit,cfp,status,notes
+Register,register,flaskr/auth.py,POST /auth/register,1,0,1,1,3,draft,E: username+password; W: user; X: error message. Duplicate check is done by the DB constraint so no separate Read.
+Log in,login,flaskr/auth.py,POST /auth/login,1,1,0,1,3,draft,E: credentials; R: user; X: error message. Session cookie is not persistent storage so no Write.
+Log out,logout,flaskr/auth.py,GET /auth/logout,1,0,0,0,1,draft,Only clears the session cookie. Below the COSMIC minimum of 2 CFP; may not be a functional process at all. NEEDS DECISION.
+View posts,index,flaskr/blog.py,GET /,1,2,0,1,4,draft,E: request; R: post + user (JOIN reads two objects of interest); X: post list. Counting the JOIN as 1 Read gives 3.
+Create post,create,flaskr/blog.py,POST /create,1,0,1,1,3,draft,E: title+body; W: post; X: error message.
+Edit post,update,flaskr/blog.py,GET/POST /<id>/update,1,2,1,2,6,draft,E: id+title+body; R: post + user (via get_post); W: post; X: current post shown in form + error message. GET and POST could be split into two processes.
+Delete post,delete,flaskr/blog.py,POST /<id>/delete,1,2,1,1,5,draft,E: id; R: post + user (author check via get_post); W: post; X: 403/404 error message.
+Initialize database,init_db_command,flaskr/db.py,CLI flask init-db,1,0,2,1,4,draft,E: command; W: user table + post table (recreated); X: confirmation message.
+Hello,hello,flaskr/__init__.py,GET /hello,1,0,0,1,2,draft,E: request; X: fixed greeting.
